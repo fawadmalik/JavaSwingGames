@@ -29,7 +29,7 @@ public class SnakeGame extends JPanel implements ActionListener {
 
     // Define the delay between 'ticks' of the timer
     // Timer will trigger actionPerformed method every 100ms
-    private final int DELAY = 120;
+    private final int DELAY = 90;
 
     // Setup colors for drawing snake
     private final Color SNAKE_HEAD_COLOR = new Color(Integer.parseInt("215E21", 16));
