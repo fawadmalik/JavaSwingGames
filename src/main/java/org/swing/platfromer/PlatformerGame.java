@@ -3,7 +3,11 @@ package org.swing.platfromer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 
 public class PlatformerGame extends JPanel implements ActionListener, KeyListener {
 
@@ -18,6 +22,7 @@ public class PlatformerGame extends JPanel implements ActionListener, KeyListene
     private final int maxFallSpeed = 10; // Terminal velocity
 
     private ArrayList<Platform> platforms;
+    private BufferedImage playerImage; // Character sprite
 
     public PlatformerGame() {
         this.setPreferredSize(new Dimension(800, 600));
@@ -32,6 +37,13 @@ public class PlatformerGame extends JPanel implements ActionListener, KeyListene
         playerVelocityY = 0;
         isJumping = false;
         isOnGround = true;
+
+        // Load the character sprite
+        try {
+            playerImage = ImageIO.read(new File("character.png")); // Replace with your image path
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Initialize platforms
         platforms = new ArrayList<>();
@@ -48,9 +60,14 @@ public class PlatformerGame extends JPanel implements ActionListener, KeyListene
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw player
-        g.setColor(Color.RED);
-        g.fillRect(playerX, playerY, 50, 50); // Player as a simple square
+        // Draw player (sprite)
+        if (playerImage != null) {
+            g.drawImage(playerImage, playerX, playerY, null);
+        } else {
+            // Fallback: draw red rectangle if image is not loaded
+            g.setColor(Color.RED);
+            g.fillRect(playerX, playerY, 50, 50);
+        }
 
         // Draw ground (a simple line at y=550)
         g.setColor(Color.WHITE);
@@ -89,9 +106,9 @@ public class PlatformerGame extends JPanel implements ActionListener, KeyListene
 
         // Check for collision with platforms
         for (Platform platform : platforms) {
-            if (playerX + 50 > platform.x && playerX < platform.x + platform.width &&
-                    playerY + 50 > platform.y && playerY + 50 <= platform.y + playerVelocityY) {
-                playerY = platform.y - 50;
+            if (playerX + getPlayerWidth() > platform.x && playerX < platform.x + platform.width &&
+                    playerY + getPlayerHeight() > platform.y && playerY + getPlayerHeight() <= platform.y + playerVelocityY) {
+                playerY = platform.y - getPlayerHeight();
                 playerVelocityY = 0;
                 isJumping = false;
                 isOnGround = true;
@@ -135,6 +152,14 @@ public class PlatformerGame extends JPanel implements ActionListener, KeyListene
     @Override
     public void keyTyped(KeyEvent e) {
         // Not used
+    }
+
+    private int getPlayerWidth() {
+        return playerImage != null ? playerImage.getWidth() : 50;
+    }
+
+    private int getPlayerHeight() {
+        return playerImage != null ? playerImage.getHeight() : 50;
     }
 
     public static void main(String[] args) {
